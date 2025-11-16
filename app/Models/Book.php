@@ -28,8 +28,9 @@ class Book extends Model
         'name',
         'idCategory',
         'descriptions',
-        'content',
+        'link',
         'price',
+        'gambar',
         'book_address',
     ];
 

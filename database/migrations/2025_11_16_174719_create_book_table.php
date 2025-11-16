@@ -22,8 +22,9 @@ return new class extends Migration
             $table->string('name')->nullable();
             $table->foreignId('idCategory')->nullable()->constrained('category')->onDelete('cascade');
             $table->text('descriptions')->nullable();
-            $table->text('contents')->nullable();
+            $table->string('link')->nullable();
             $table->integer('price')->nullable()->default(1);
+            $table->string('gambar')->nullable();
             $table->text('book_address')->nullable();
             $table->timestamps();
         });
@@ -34,7 +35,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('category');
         Schema::dropIfExists('book');
+        Schema::dropIfExists('category');
     }
 };
