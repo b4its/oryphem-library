@@ -30,6 +30,7 @@ class Book extends Model
         'descriptions',
         'link',
         'price',
+        'sold',
         'gambar',
         'book_address',
     ];

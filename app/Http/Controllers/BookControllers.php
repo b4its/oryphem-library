@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Book;
 use Illuminate\Http\Request;
 
+use function Termwind\render;
+
 class BookControllers extends Controller
 {
     /**
@@ -25,6 +27,18 @@ class BookControllers extends Controller
     public function index()
     {
         //
+        $books = Book::orderBy('created_at', 'desc')->limit(5)->get(); 
+
+        // 2. Laravel akan mengkonversi koleksi Eloquent ini secara otomatis
+        //    menjadi JSON, yang mencakup semua kolom (termasuk id, created_at, updated_at).
+        //    'content' (yang menyimpan tech sebagai string) dan 'idCategory' serta 'price'
+        //    akan ikut terkirim.
+        
+        return view('welcome', 
+        [
+            'books' => $books
+        ]
+        );
     }
 
     /**

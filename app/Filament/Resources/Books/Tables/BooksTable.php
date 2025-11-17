@@ -3,12 +3,15 @@
 namespace App\Filament\Resources\Books\Tables;
 
 use App\Models\Book;
+use App\Models\Profile;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\CreateAction;
 use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
 
 class BooksTable
@@ -54,8 +57,14 @@ class BooksTable
                 //
             ])
             ->recordActions([
-                EditAction::make(),
+                EditAction::make()
+                    ->mutateRecordDataUsing(function (array $data): array {
+                        $userId = Auth::id();
+                        $profile = Profile::where('idUsers', $userId)->first();
+                        $data['name'] = 'ujang';
 
+                        return $data;
+                    }),
                 DeleteAction::make()
                     ->button()
                     ->color('danger') // default abu-abu (tidak merah)
@@ -64,6 +73,7 @@ class BooksTable
                     ->modalDescription('apakah yakin ingin menghapus data ini?')
                     ->modalSubmitActionLabel('Ya, Hapus'),
             ])
+            
             ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),

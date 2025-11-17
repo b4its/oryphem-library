@@ -67,7 +67,8 @@ function initParticles() {
     
     for (let i = 0; i < particleCount; i++) {
         const particle = document.createElement('div');
-        particle.className = 'particle';
+        // PREFIX: particle -> orx-particle
+        particle.className = 'orx-particle';
         
         // Random horizontal position
         particle.style.left = Math.random() * 100 + '%';
@@ -92,7 +93,8 @@ const indicatorsContainer = document.getElementById('indicators');
 
 function createCarouselItem(data, index) {
     const item = document.createElement('div');
-    item.className = 'carousel-item';
+    // PREFIX: carousel-item -> orx-carousel-item
+    item.className = 'orx-carousel-item';
     item.dataset.index = index;
     
     // Pastikan data.idCategory adalah array sebelum menggunakan map, 
@@ -100,60 +102,32 @@ function createCarouselItem(data, index) {
     const categories = Array.isArray(data.idCategory) ? data.idCategory : [data.idCategory].filter(c => c);
     
     const techBadges = categories.map(category => 
-        `<span class="tech-badge">${category}</span>`
+        // PREFIX: tech-badge -> orx-tech-badge
+        `<span class="orx-tech-badge">${category}</span>`
     ).join('');
     const shortDescription = truncateText(data.descriptions, 150);
+    
+    // Semua kelas custom di dalam string HTML ini harus di-prefix
     item.innerHTML = `
-        <div class="card-box">
-            <div class="card-number">0${data.id}</div>
-            <div class="card-image">
+        <div class="orx-card-box">
+            <div class="orx-card-number">0${data.id}</div>
+            <div class="orx-card-image">
                 <img src="${data.gambar}" alt="${data.name}">
             </div>
-            <h3 class="card-title">${data.name}</h3>
-            <p class="card-description">${shortDescription}..</p>
-            <div class="card-tech">${techBadges}</div>
-
-            <button class="card-cta" data-bs-toggle="modal" data-bs-target="#modal-${data.id}">
+            <h3 class="orx-card-title">${data.name}</h3>
+            <div class="orx-card-description">
+            ${shortDescription}..
+            </div>
+            <div class="orx-card-tech">${techBadges}</div>
+            <div>
+                <p class="badge text-bg-success rounded-pill">Price: ${data.price} ORX</p>
+            </div>
+            <button class="orx-card-cta" data-bs-toggle="modal" data-bs-target="#modal-${data.id}">
                 Jelajahi
             </button>
         </div>
 
-        <div class="modal fade" id="modal-${data.id}" tabindex="-1" aria-labelledby="modalLabel-${data.id}" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel-${data.id}">${data.name}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <div class="modal-card-image text-center mb-3">
-                            <img src="${data.gambar}" alt="${data.name}" class="img-fluid rounded" style="max-height: 400px;">
-                        </div>
-                        
-                        <div class="modal-card-number text-muted small">
-                            Project: 0${data.id}
-                        </div>
-                        
-                        <h4 class="mt-2">Deskripsi Project</h4>
-                        <p class="modal-card-description">
-                            ${data.fullDescription} 
-                        </p>
-                        
-                        <h5 class="mt-3">Teknologi yang Digunakan</h5>
-                        <div class="modal-card-tech">
-                            ${techBadges}
-                        </div>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                        </div>
-                    
-                </div>
-            </div>
-        </div>
+
     `;
     
     return item;
@@ -177,8 +151,10 @@ function initCarousel() {
         
         // Create indicator
         const indicator = document.createElement('div');
-        indicator.className = 'indicator';
-        if (index === 0) indicator.classList.add('active');
+        // PREFIX: indicator -> orx-indicator
+        indicator.className = 'orx-indicator';
+        // PREFIX: active -> orx-active
+        if (index === 0) indicator.classList.add('orx-active');
         indicator.dataset.index = index;
         indicator.addEventListener('click', () => goToSlide(index));
         indicatorsContainer.appendChild(indicator);
@@ -190,8 +166,10 @@ function initCarousel() {
 function updateCarousel() {
     if (portfolioData.length === 0) return;
     
-    const items = document.querySelectorAll('.carousel-item');
-    const indicators = document.querySelectorAll('.indicator');
+    // PREFIX: .carousel-item -> .orx-carousel-item
+    const items = document.querySelectorAll('.orx-carousel-item');
+    // PREFIX: .indicator -> .orx-indicator
+    const indicators = document.querySelectorAll('.orx-indicator');
     const totalItems = items.length;
     const isMobile = window.innerWidth <= 768;
     const isTablet = window.innerWidth <= 1024;
@@ -273,7 +251,8 @@ function updateCarousel() {
     
     // Update indicators
     indicators.forEach((indicator, index) => {
-        indicator.classList.toggle('active', index === currentIndex);
+        // PREFIX: active -> orx-active
+        indicator.classList.toggle('orx-active', index === currentIndex);
     });
 }
 
@@ -344,8 +323,9 @@ const navMenu = document.getElementById('navMenu');
 
 if (menuToggle && navMenu) { // Pengecekan null
     menuToggle.addEventListener('click', () => {
-        navMenu.classList.toggle('active');
-        menuToggle.classList.toggle('active');
+        // PREFIX: active -> orx-active
+        navMenu.classList.toggle('orx-active');
+        menuToggle.classList.toggle('orx-active');
     });
 }
 
@@ -355,9 +335,10 @@ const header = document.getElementById('header');
 if (header) {
     window.addEventListener('scroll', () => {
         if (window.scrollY > 100) {
-            header.classList.add('scrolled');
+            // PREFIX: scrolled -> orx-scrolled
+            header.classList.add('orx-scrolled');
         } else {
-            header.classList.remove('scrolled');
+            header.classList.remove('orx-scrolled');
         }
     });
 }
@@ -365,7 +346,8 @@ if (header) {
 
 // Smooth scrolling and active navigation
 const sections = document.querySelectorAll('section[id]');
-const navLinks = document.querySelectorAll('.nav-link');
+// PREFIX: .nav-link -> .orx-nav-link
+const navLinks = document.querySelectorAll('.orx-nav-link');
 
 navLinks.forEach(link => {
     link.addEventListener('click', function(e) {
@@ -375,8 +357,9 @@ navLinks.forEach(link => {
         
         // Close mobile menu if open
         if (navMenu && menuToggle) {
-            navMenu.classList.remove('active');
-            menuToggle.classList.remove('active');
+            // PREFIX: active -> orx-active
+            navMenu.classList.remove('orx-active');
+            menuToggle.classList.remove('orx-active');
         }
     });
 });
@@ -393,10 +376,11 @@ function updateActiveNav() {
         
         if (scrollPosition >= sectionTop && scrollPosition < sectionTop + sectionHeight) {
             navLinks.forEach(link => {
-                link.classList.remove('active');
+                // PREFIX: active -> orx-active
+                link.classList.remove('orx-active');
                 const href = link.getAttribute('href').substring(1);
                 if (href === sectionId) {
-                    link.classList.add('active');
+                    link.classList.add('orx-active');
                 }
             });
         }
@@ -431,15 +415,18 @@ const observerOptions = {
     rootMargin: '0px 0px -100px 0px'
 };
 
-const statsSection = document.querySelector('.stats-section');
+// PREFIX: .stats-section -> .orx-stats-section
+const statsSection = document.querySelector('.orx-stats-section');
 if (statsSection) {
     const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                const statNumbers = entry.target.querySelectorAll('.stat-number');
+                // PREFIX: .stat-number -> .orx-stat-number
+                const statNumbers = entry.target.querySelectorAll('.orx-stat-number');
                 statNumbers.forEach(number => {
-                    if (!number.classList.contains('animated')) {
-                        number.classList.add('animated');
+                    // PREFIX: animated -> orx-animated
+                    if (!number.classList.contains('orx-animated')) {
+                        number.classList.add('orx-animated');
                         animateCounter(number);
                     }
                 });
@@ -459,7 +446,8 @@ window.addEventListener('load', () => {
     setTimeout(() => {
         const loader = document.getElementById('loader');
         if (loader) {
-            loader.classList.add('hidden');
+            // PREFIX: hidden -> orx-hidden
+            loader.classList.add('orx-hidden');
         }
     }, 1500);
 });
@@ -467,7 +455,8 @@ window.addEventListener('load', () => {
 // Add parallax effect to hero section
 window.addEventListener('scroll', () => {
     const scrolled = window.pageYOffset;
-    const parallax = document.querySelector('.hero');
+    // PREFIX: .hero -> .orx-hero
+    const parallax = document.querySelector('.orx-hero');
     if (parallax) {
         parallax.style.transform = `translateY(${scrolled * 0.5}px)`;
     }

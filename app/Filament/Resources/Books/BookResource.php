@@ -45,4 +45,5 @@ class BookResource extends Resource
             // 'edit' => EditBook::route('/{record}/edit'),
         ];
     }
+
 }

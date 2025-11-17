@@ -24,6 +24,7 @@ return new class extends Migration
             $table->text('descriptions')->nullable();
             $table->string('link')->nullable();
             $table->integer('price')->nullable()->default(1);
+            $table->integer('sold')->nullable()->default(1);
             $table->string('gambar')->nullable();
             $table->text('book_address')->nullable();
             $table->timestamps();
