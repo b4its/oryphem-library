@@ -15,10 +15,10 @@ Route::controller(MetamaskController::class)->group(function () {
 });
 
 Route::controller(TokenControllers::class)->group(function () {
-    Route::post('/buy-token', 'buyToken')->name('token.buy'); 
+    Route::post('/buy-ory-token', 'buyOryToken')->name('token.buy'); 
 });
 
 Route::controller(BookControllers::class)->group(function () {
     Route::get('/', 'index')->name('dashboard');       // Tampilkan semua post
-    Route::get('/api/books', 'api_getBook_all')->name('getBook');       // Tampilkan semua post
+    Route::post('/purchase-book', 'purchaseBook')->name("purchaseBook");       // Tampilkan semua post
 }); 

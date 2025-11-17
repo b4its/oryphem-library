@@ -97,14 +97,13 @@ function createCarouselItem(data, index) {
     item.className = 'orx-carousel-item';
     item.dataset.index = index;
     
-    // Pastikan data.idCategory adalah array sebelum menggunakan map, 
-    // dan tangani kasus di mana nilainya bukan array (misalnya string tunggal atau null).
-    const categories = Array.isArray(data.idCategory) ? data.idCategory : [data.idCategory].filter(c => c);
+    // --- PERUBAHAN UTAMA DI SINI ---
+    // Akses nama kategori langsung dari objek relasi 'category'
+    const categoryName = data.category ? data.category.name : 'Uncategorized'; // Cek jika relasi ada
     
-    const techBadges = categories.map(category => 
-        // PREFIX: tech-badge -> orx-tech-badge
-        `<span class="orx-tech-badge">${category}</span>`
-    ).join('');
+    // techBadges sekarang hanya perlu membuat satu badge dari nama kategori
+    const techBadges = `<span class="orx-tech-badge">${categoryName}</span>`;
+
     const shortDescription = truncateText(data.descriptions, 150);
     
     // Semua kelas custom di dalam string HTML ini harus di-prefix
@@ -118,10 +117,15 @@ function createCarouselItem(data, index) {
             <div class="orx-card-description">
             ${shortDescription}..
             </div>
-            <div class="orx-card-tech">${techBadges}</div>
-            <div>
-                <p class="badge text-bg-success rounded-pill">Price: ${data.price} ORX</p>
+            <div class="d-flex flex-row flex-md-column>
+                <p class="orx-card-tech">
+                </p>
+                <div class="orx-card-tech">${techBadges}
+                </div>
+                <p class="orx-card-tech"><span class="orx-tech-badge" style="color:#a5efbfff;border:1px solid #a5efbfff">Price: ${data.price} <b>ORX</b></span> 
+                </p>
             </div>
+             
             <button class="orx-card-cta" data-bs-toggle="modal" data-bs-target="#modal-${data.id}">
                 Jelajahi
             </button>

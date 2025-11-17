@@ -15,7 +15,16 @@ return new class extends Migration
             $table->id();
             $table->foreignId('idUsers')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('idBook')->nullable()->constrained('book')->onDelete('cascade');
-            $table->text('transaction_address')->nullable();
+            $table->string('jenis')->nullable();
+            $table->text('descriptions')->nullable();
+            $table->string('transaction_address')->nullable();
+            $table->timestamps();
+        });
+
+        Schema::create('book_owner', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('idUsers')->nullable()->constrained('users')->onDelete('cascade');
+            $table->foreignId('idTransaction')->nullable()->constrained('transaction')->onDelete('cascade');
             $table->timestamps();
         });
     }
@@ -26,5 +35,6 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('transaction');
+        Schema::dropIfExists('book_owner');
     }
 };

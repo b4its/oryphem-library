@@ -5,17 +5,19 @@ use Illuminate\Database\Eloquent\Model;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-class Transaction extends Model
+
+
+class BookOwner extends Model
 {
     //
-    use HasFactory;
+ use HasFactory;
 
     /**
      * Nama tabel yang digunakan oleh model.
      *
      * @var string
      */   
-    protected $table = 'transaction';
+    protected $table = 'book_owner';
 
     /**
      * Atribut yang dapat diisi secara massal.
@@ -24,24 +26,20 @@ class Transaction extends Model
      */
     protected $fillable = [
         'idUsers',
-        'idBook',
-        'jenis',
-        'descriptions',
-        'transaction_address',
-      
+        'idTransaction',
     ];
-
-    public function book(): BelongsTo
-    {
-        // Kita perlu mendefinisikan foreign key secara eksplisit
-        // karena nama kolom 'idUsers' tidak mengikuti konvensi Laravel ('user_id').
-        return $this->belongsTo(Book::class, 'idBook');
-    }
 
     public function user(): BelongsTo
     {
         // Kita perlu mendefinisikan foreign key secara eksplisit
         // karena nama kolom 'idUsers' tidak mengikuti konvensi Laravel ('user_id').
         return $this->belongsTo(User::class, 'idUsers');
+    }
+
+    public function category(): BelongsTo
+    {
+        // Kita perlu mendefinisikan foreign key secara eksplisit
+        // karena nama kolom 'idUsers' tidak mengikuti konvensi Laravel ('user_id').
+        return $this->belongsTo(Category::class, 'idCategory');
     }
 }

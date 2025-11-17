@@ -4,10 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Oryphem Library</title>
-    <meta name="csrf-token" content="{{ csrf_token() }}"> 
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="stylesheet" href="{{ asset('assets/templatemo-prism-flux.css') }}"> 
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
-    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <style>
         .nav-link .badge.connected {
             background-color: #198754 !important; /* Hijau sukses */
@@ -19,124 +19,202 @@
 </head>
 <body>
     
-    @foreach ($books as $item)
-        <div class="modal fade" id="modal-{{ $item->id }}" tabindex="-1" aria-labelledby="modalLabel-{{ $item->id }}" aria-hidden="true">
-            <div class="modal-dialog modal-lg modal-dialog-centered">
-                <div class="modal-content">
-                    
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalLabel-{{ $item->id }}">{{ $item->name }}</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    
-                    <div class="modal-body">
-                        <div class="modal-card-image text-center mb-3">
-                            <img src="{{ $item->gambar }}" alt="{{ $item->name }}" class="img-fluid rounded" style="max-height: 400px;">
-                        </div>
+@foreach ($books as $item)
+    <div class="modal fade" id="modal-{{ $item->id }}" tabindex="-1" aria-labelledby="modalLabel-{{ $item->id }}" aria-hidden="true">
+        {{-- 
+            MODERNISASI (1):
+            Kita buat modal-dialog lebih besar (`modal-xl`) agar layout 2 kolom tidak sempit.
+            Kita juga tambahkan `modal-dialog-scrollable` untuk jaga-jaga jika sinopsisnya sangat panjang.
+        --}}
+        <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                
+                {{-- 
+                    MODERNISASI (2):
+                    Kita hilangkan `modal-header` dan `modal-footer` bawaan.
+                    Kita akan buat header & footer kustom yang lebih menyatu dengan desain.
+                    Tombol close kita taruh secara absolut di pojok.
+                --}}
+                <div class="modal-body p-0"> 
+                    {{-- Tombol close kustom di pojok kanan atas --}}
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close" 
+                            style="position: absolute; top: 1rem; right: 1rem; z-index: 10;"></button>
+
+                    <div class="row g-0"> {{-- `g-0` untuk menghilangkan gutter antar kolom --}}
                         
-                        <div class="modal-card-number text-muted small">
-                            Project: 0{{ $item->id }}
+                        <div class="col-lg-5">
+                            {{-- 
+                                MODERNISASI (3):
+                                Kita gunakan `object-fit: cover` untuk memastikan gambar
+                                mengisi penuh area tanpa distorsi (aspect ratio terjaga).
+                                Ini adalah trik frontend yang SANGAT penting untuk UI grid.
+                            --}}
+                            <img src="{{ $item->gambar }}" alt="{{ $item->name }}" class="img-fluid" 
+                                 style="width: 100%; height: 100%; min-height: 450px; object-fit: cover;">
                         </div>
-                        
-                        <h4 class="mt-2">Sinopsis</h4>
-                        <p class="modal-card-description">
-                            {!! $item->descriptions !!}
-                        </p>
-                        
-                        <h5 class="mt-3">Kategori</h5>
-                        <div class="orx-card-tech">
-                            {{ $item->category->name }}
+
+                        <div class="col-lg-7 p-4 p-md-5 d-flex flex-column">
+                            
+                            {{-- Project ID (dibuat subtle) --}}
+                            <div class="text-muted small mb-1">
+                                Project: 0{{ $item->id }}
+                            </div>
+
+                            {{-- Judul Buku --}}
+                            <h2 class="modal-title mb-2" id="modalLabel-{{ $item->id }}">{{ $item->name }}</h2>
+                            
+                            {{-- 
+                                MODERNISASI (4):
+                                Kategori kita ubah menjadi "Badge" (Pill).
+                                Ini memberikan hierarki visual yang jelas.
+                            --}}
+                            <div class="mb-3">
+                                <span class="badge rounded-pill bg-primary-subtle text-primary-emphasis fs-6">
+                                    {{ $item->category->name }}
+                                </span>
+                            </div>
+
+                            {{-- Sinopsis --}}
+                            <h5 class="fw-bold mt-2">Sinopsis</h5>
+                            <div class="modal-card-description mb-4">
+                                {!! $item->descriptions !!}
+                            </div>
+
+                            {{-- 
+                                MODERNISASI (5):
+                                Ini bagian UX. Kita letakkan Harga & Tombol Aksi BERDEKATAN.
+                                Prinsip Desain "Proximity": Hal yang terkait harus diletakkan berdekatan.
+                                Kita gunakan `mt-auto` untuk mendorong blok ini ke bagian paling bawah
+                                dari kolom, menciptakan layout yang rapi.
+                            --}}
+                            <div class="mt-auto bg-body-tertiary p-3 rounded">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    {{-- Info Harga --}}
+                                    <div>
+                                        <h6 class="text-muted mb-0">Harga</h6>
+                                        <h3 class="fw-bold mb-0" id="price-{{ $item->id }}">
+                                            {{ $item->price }} 
+                                            <span class="fs-5 fw-normal">ORX</span>
+                                        </h3>
+                                    </div>
+                                    
+                                    {{-- Tombol Aksi --}}
+                                    <div>
+                                        <button type="button" class="btn btn-secondary me-2" data-bs-dismiss="modal">Tutup</button>
+                                        <button type="button" 
+                                                class="btn btn-success btn-lg buy-book-btn" 
+                                                data-book-id="{{ $item->id }}"
+                                                data-book-price="{{ $item->price }}"
+                                                data-bs-dismiss="modal">
+                                            Beli Sekarang
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
-                        <h5 class="mt-3">Harga</h5>
-                        <div class="orx-card-tech">
-                            <b><span id="price-{{ $item->id }}">{{ $item->price }}</span> ORX</b> Token
-                        </div>
-                    </div>
-                    
-                    <div class="modal-footer">
-                        <button type="button" 
-                                class="btn btn-success buy-book-btn" 
-                                data-book-id="{{ $item->id }}"
-                                data-book-price="{{ $item->price }}"
-                                data-bs-dismiss="modal">
-                            Beli Sekarang (ORX)
-                        </button>
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    </div>
-                    
-                </div>
-            </div>
+                    </div> </div> </div>
         </div>
-    @endforeach
-    
+    </div>
+@endforeach
+
 <div class="modal fade" id="buyOryModal" tabindex="-1" aria-labelledby="buyOryModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
+        <div class="modal-content border-0 shadow-lg" style="border-radius: 0.8rem;">
             
             {{-- HEADER MODAL --}}
-            <div class="modal-header">
-                <h5 class="modal-title" id="buyOryModalLabel">Beli Oryphem Token (ORX)</h5>
+            <div class="modal-header border-bottom-0 pb-0">
+                <h5 class="modal-title fw-bold" id="buyOryModalLabel">
+                    <i class="fas fa-coins me-2 text-warning"></i> 
+                    Beli Oryphem Token (ORX)
+                </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             
             {{-- BODY MODAL --}}
-            <div class="modal-body text-center">
+            <div class="modal-body p-4">
                 
-                {{-- INFORMASI SALDO ORYPHEM TOKEN --}}
-                <div class="mb-4 p-2 bg-light rounded">
-                    <p class="text-muted mb-0 small">ORYPHEM TOKEN YANG DIMILIKI:</p>
-                    <h4 class="text-dark">
-                        {{-- ID yang digunakan di skrip utama --}}
-                        <p class="token-display" id="orx-balance-display">0 ORX</p>
-                    </h4>
-                </div>
-
                 <form id="form-buy-ory">
                     
-                    {{-- INPUT JUMLAH PEMBELIAN --}}
-                    <h5 class="mt-3 text-muted">Jumlah yang Ingin Dibeli (ORX)</h5>
-                    <div class="d-flex align-items-center justify-content-center my-3">
-                        <button type="button" class="btn btn-outline-secondary me-3" onclick="updateOryAmount(-1)">
+                    {{-- INPUT HIDDEN UNTUK BACKEND LARAVEL --}}
+                    {{-- Pastikan variabel PHP ini tersedia di view Anda. Asumsikan ID Book/Token ORX adalah 1. --}}
+                    @php
+                        // Contoh placeholder jika Anda tidak menggunakan Blade/PHP
+                        $user_id = Auth::check() ? Auth::id() : ''; 
+                    @endphp
+                    
+                    <input type="hidden" id="input-id-users" value="{{ $user_id }}">
+
+                    {{-- INFORMASI STATIS (Saldo & Kurs) --}}
+                    <div class="row g-2 mb-4">
+                        {{-- Saldo Anda --}}
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 text-center h-100">
+                                <p class="text-muted small mb-1">Saldo ORX Anda</p>
+                                <h5 class="fw-bold text-dark mb-0" id="orx-balance-display">
+                                    0 ORX
+                                </h5>
+                            </div>
+                        </div>
+                        {{-- Kurs Saat Ini --}}
+                        <div class="col-6">
+                            <div class="p-3 border rounded-3 text-center h-100">
+                                <p class="text-muted small mb-1">Kurs Saat Ini</p>
+                                <h5 class="fw-bold text-dark mb-0">
+                                    1 ORX = 10 Wei
+                                </h5>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- INPUT UTAMA (STEPPER) --}}
+                    <h5 class="text-center text-muted mb-3">Jumlah ORX yang Ingin Dibeli</h5>
+                    
+                    {{-- Menggunakan Input Group untuk UI yang lebih kohesif --}}
+                    <div class="input-group input-group-lg w-75 mx-auto mb-3">
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateOryAmount(-1)" aria-label="Kurangi jumlah">
                             <i class="fas fa-minus"></i>
                         </button>
                         
-                        <input type="number" id="ory-amount-input" class="form-control form-control-lg text-center fw-bold" 
-                            style="width: 120px; font-size: 2.5rem; height: 3.5rem; border: none;" value="1" min="1" readonly>
-
-                        <button type="button" class="btn btn-outline-secondary ms-3" onclick="updateOryAmount(1)">
+                        <input type="text" id="ory-amount-input" class="form-control text-center fw-bolder display-6" 
+                                value="1" min="1" readonly 
+                                aria-label="Jumlah token"
+                                style="height: auto;">
+                        
+                        <button class="btn btn-outline-secondary" type="button" onclick="updateOryAmount(1)" aria-label="Tambah jumlah">
                             <i class="fas fa-plus"></i>
                         </button>
                     </div>
 
-                    {{-- OUTPUT HARGA DINAMIS (BARU) --}}
-                    <div class="alert alert-success py-2 mt-4" role="alert">
-                        <p class="mb-0 small text-muted">Total Harga (Sepolia ETH):</p>
-                        <strong class="h5" id="eth-total-price">0.000000000000000010 ETH</strong>
-                        <p class="text-muted small mb-0 mt-1">
-                            (Kurs: 1 ORX = 10 Wei)
-                        </p>
+                    {{-- OUTPUT HARGA DINAMIS (Konfirmasi Total) --}}
+                    <div class="p-3 rounded-3 bg-success-subtle text-success-emphasis text-center mt-4">
+                        <p class="mb-1 small">Total Harga (Sepolia ETH):</p>
+                        <h3 class="fw-bold mb-0" id="eth-total-price">
+                            0.000000000000000010 ETH
+                        </h3>
                     </div>
-                    
-                    <p class="text-danger small mt-2">
-                        Pastikan Anda memiliki Sepolia ETH yang cukup di wallet Anda.
-                    </p>
-                </form>
 
+                    <p class="text-danger small text-center mt-3">
+                        <i class="fas fa-exclamation-triangle me-1"></i>
+                        Pastikan Anda memiliki Sepolia ETH yang cukup.
+                    </p>
+
+                </form>
             </div>
             
-            {{-- FOOTER MODAL (Tombol Submit Warna Hijau) --}}
-            <div class="modal-footer d-flex justify-content-between">
-                {{-- TOMBOL SUBMIT HIJAU (Menggunakan type="button" dan memanggil fungsi JS) --}}
+            {{-- FOOTER MODAL (Tombol Aksi) --}}
+            <div class="modal-footer border-top-0 pt-0 p-4">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
                 <button type="button" id="submitBuyOry" class="btn btn-success fw-bold">
+                    <i class="fas fa-check-circle me-2"></i>
                     Konfirmasi Pembelian
                 </button>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal / Tutup</button>
-                
             </div>
             
         </div>
     </div>
 </div>
+
 
     <header class="orx-header" id="header">
         <nav class="orx-nav-container">
@@ -273,27 +351,30 @@ Wujudkan potensi maksimal Anda! Oryphem Library hadir dengan varian buku panduan
     <script src="{{ asset('assets/templatemo-prism-scripts.js') }}"></script>
     
 <script>
-    // Pastikan Anda telah mengimpor library ethers.js di halaman Anda.
-    
     // =========================================================================
     // --- KONFIGURASI WEB3 (WAJIB DIGANTI!) ---
+    // Ganti ini dengan nilai kontrak dan alamat yang sesungguhnya.
     // =========================================================================
-    
+
     // Alamat Kontrak OryphemToken (ORX) yang di-deploy di Sepolia
+    // GANTI INI dengan alamat kontrak ORX Anda yang sudah di-deploy.
     const ORX_TOKEN_ADDRESS = "0x472563012E256D0338c75efd727D629A35283986"; 
     
-    // Alamat Dompet Platform/Penerima Pembayaran (Nilai ini diabaikan oleh buyOry()
-    // tetapi mungkin masih diperlukan untuk buyBookWithORX() atau fungsi lain)
+    // Alamat Dompet Platform/Penerima Pembayaran
     const PLATFORM_WALLET_ADDRESS = "0x6EdcA860c066FCdA6c434095d5901810DCE12b48"; 
+
+    // ✅ KOREKSI PENTING: Jika 5 ORX harus ditransfer sebagai 5 unit, 
+    // desimal token harus 0. Sesuaikan angka ini dengan desimal kontrak Anda.
+    const ORX_TOKEN_DECIMALS = 0; 
     
-    // Konstanta Harga: 1 ORX = 10 Wei (Wei adalah satuan terkecil dari ETH)
+    // Konstanta Harga Buy ORX: 1 ORX = 10 Wei ETH
     const ORX_TO_WEI_RATE = 10n; // Menggunakan BigInt untuk presisi Wei
-    
+
     const SEPOLIA_CHAIN_ID = '0xaa36a7'; // Hex untuk 11155111
     const CHAIN_ID_DECIMAL = 11155111;
     const METAMASK_ADDRESS_KEY = 'b6561b56270a4d34878dbf311580ddd3'; 
-    
-    // 🔥 ABI Minimal yang Diperbarui untuk OryphemToken.sol
+
+    // ABI Minimal untuk fungsi transfer, balanceOf, dan buy
     const ORX_TOKEN_ABI = [
         // Function: transfer(address to, uint256 value)
         {
@@ -319,28 +400,26 @@ Wujudkan potensi maksimal Anda! Oryphem Library hadir dengan varian buku panduan
             "outputs": [
                 { "name": "", "type": "uint256" }
             ],
-            "name": "balanceOf",
             "stateMutability": "view",
             "type": "function"
         },
-        // 🔥 Fungsi BARU: buy() - Memungkinkan pengguna mengirim ETH dan menerima token
+        // Fungsi: buy() - Memungkinkan pengguna mengirim ETH dan menerima token
         {
             "constant": false,
             "inputs": [],
             "name": "buy",
             "outputs": [],
-            "stateMutability": "payable", // HARUS 'payable'
+            "stateMutability": "payable", 
             "type": "function"
         }
     ];
 
     let currentAccount = localStorage.getItem(METAMASK_ADDRESS_KEY);
-    
-    // =========================================================================
-    
-    /**
-     * UTILS (Tidak Berubah)
-     */
+
+    // -------------------------------------------------------------------------
+    // --- UTILS & STATUS ---
+    // -------------------------------------------------------------------------
+
     const shortenAddress = (address) => {
         if (!address || address.length < 10) return address;
         return `${address.substring(0, 6)}...${address.slice(-4)}`;
@@ -350,8 +429,6 @@ Wujudkan potensi maksimal Anda! Oryphem Library hadir dengan varian buku panduan
         const statusItem = document.getElementById('metamask-status-item');
         if (statusItem) {
             const shortAddress = shortenAddress(address);
-            
-            // Mengubah konten list item menjadi status 'Terhubung'
             statusItem.innerHTML = `
                 <a href="#" id="viewAccountDetailsBtn" class="nav-link">
                     Wallet Connected:
@@ -363,33 +440,31 @@ Wujudkan potensi maksimal Anda! Oryphem Library hadir dengan varian buku panduan
             currentAccount = address;
         }
     };
-    
-const updateORXBalance = async (address) => {
-    const balanceDisplay = document.getElementById('orx-balance-display');
-    if (!balanceDisplay) return;
 
-    try {
-        const provider = new ethers.BrowserProvider(window.ethereum);
-        const orxContract = new ethers.Contract(ORX_TOKEN_ADDRESS, ORX_TOKEN_ABI, provider);
+    const updateORXBalance = async (address) => {
+        const balanceDisplay = document.getElementById('orx-balance-display');
+        if (!balanceDisplay) return;
 
-        const balanceBigInt = await orxContract.balanceOf(address); 
-        
-        // 🔥 PERUBAHAN: Gunakan 0 Desimal
-        // Jika token Anda adalah token penuh (tanpa desimal)
-        const balanceFormatted = ethers.formatUnits(balanceBigInt, 0);
-        
-        // Gunakan parseFloat().toFixed(0) untuk menampilkan angka bulat.
-        balanceDisplay.textContent = `${parseFloat(balanceFormatted).toFixed(0)} ORX`;
+        try {
+            const provider = new ethers.BrowserProvider(window.ethereum);
+            const orxContract = new ethers.Contract(ORX_TOKEN_ADDRESS, ORX_TOKEN_ABI, provider);
 
-    } catch (error) {
-        console.error("Gagal mendapatkan saldo ORX:", error.message);
-        balanceDisplay.textContent = `ORX: Error`;
+            const balanceBigInt = await orxContract.balanceOf(address); 
+            
+            // Menggunakan desimal token yang telah dikonfigurasi
+            const balanceFormatted = ethers.formatUnits(balanceBigInt, ORX_TOKEN_DECIMALS); 
+            
+            balanceDisplay.textContent = `${parseFloat(balanceFormatted).toFixed(0)} ORX`;
+
+        } catch (error) {
+            console.error("Gagal mendapatkan saldo ORX:", error.message);
+            balanceDisplay.textContent = `ORX: Error`;
+        }
     }
-}
 
-    // =========================================================================
-    // FUNGSI KHUSUS MODAL PEMBELIAN ORX (DINAMIS)
-    // =========================================================================
+    // -------------------------------------------------------------------------
+    // --- FUNGSI KHUSUS MODAL PEMBELIAN ORX (DINAMIS) ---
+    // -------------------------------------------------------------------------
 
     /**
      * FUNGSI PERHITUNGAN HARGA DINAMIS (1 ORX = 10 WEI)
@@ -399,12 +474,12 @@ const updateORXBalance = async (address) => {
         const inputElement = document.getElementById('ory-amount-input');
         const priceElement = document.getElementById('eth-total-price');
         
-        const orxAmount = BigInt(inputElement.value);
+        const orxAmount = BigInt(inputElement.value || '0');
         
         // Hitung Total Wei = Jumlah ORX * 10 Wei
         const totalWei = orxAmount * ORX_TO_WEI_RATE;
         
-        // Konversi BigInt Wei ke string ETH yang mudah dibaca (1 ETH = 10^18 Wei)
+        // Konversi BigInt Wei ke string ETH (1 ETH = 10^18 Wei)
         const totalEth = ethers.formatUnits(totalWei, 18); // 18 desimal untuk ETH
         
         priceElement.textContent = `${totalEth} ETH`;
@@ -413,7 +488,7 @@ const updateORXBalance = async (address) => {
     }
 
     /**
-     * FUNGSI UNTUK MENGUBAH JUMLAH ORX YANG AKAN DIBELI (Tidak Berubah)
+     * FUNGSI UNTUK MENGUBAH JUMLAH ORX YANG AKAN DIBELI
      */
     function updateOryAmount(change) {
         const input = document.getElementById('ory-amount-input');
@@ -422,22 +497,17 @@ const updateORXBalance = async (address) => {
         
         if (newVal >= 1) {
             input.value = newVal;
-            calculateTotalEth(); // **PENTING:** Hitung ulang harga setiap kali jumlah berubah
+            calculateTotalEth(); // Hitung ulang harga
         }
     }
 
+
     /**
-     * 🔥 FUNGSI WEB3 YANG DIPERBAIKI: MEMBELI ORX DENGAN MEMANGGIL KONTRAK buy()
-     * Transaksi: Kirim ETH ke Kontrak OryphemToken yang akan memanggil fungsi buy().
+     * FUNGSI WEB3 UTAMA: MEMBELI ORX
      */
     async function buyOry() {
-        if (!currentAccount) {
+        if (!window.ethereum || !currentAccount) {
             alert('Harap hubungkan dompet Metamask Anda terlebih dahulu.');
-            return;
-        }
-        
-        if (ORX_TOKEN_ADDRESS.includes(0x472563012E256D0338c75efd727D629A35283986)) {
-            alert('ERROR: Harap ganti alamat kontrak token (ORX_TOKEN_ADDRESS) di kode JavaScript!');
             return;
         }
 
@@ -445,34 +515,51 @@ const updateORXBalance = async (address) => {
         const signer = await provider.getSigner();
 
         try {
-            // 1. Dapatkan total Wei yang harus dikirim
+            // 1. Dapatkan input dari user dan hitung harga
             const totalWei = calculateTotalEth();
-            const totalEthDisplay = ethers.formatUnits(totalWei, 18);
-            const orxAmount = BigInt(document.getElementById('ory-amount-input').value); // Hanya untuk display
+            if (totalWei === 0n) return; 
             
-            // Inisialisasi kontrak dengan signer untuk menulis transaksi
+            const totalEthDisplay = ethers.formatUnits(totalWei, 18); 
+            const orxAmount = BigInt(document.getElementById('ory-amount-input').value);
+            const orxAmountDisplay = orxAmount.toString();
+            
+            const idUsersElement = document.getElementById('input-id-users');
+            const idUsers = idUsersElement ? idUsersElement.value : null;
+
+            if (!idUsers) {
+                console.error('ERROR: ID Pengguna tidak ditemukan.');
+                alert('ERROR: ID Pengguna tidak ditemukan. Harap refresh halaman.');
+                return;
+            }
+
             const orxContract = new ethers.Contract(ORX_TOKEN_ADDRESS, ORX_TOKEN_ABI, signer);
 
-            // Konfirmasi ke pengguna
-            const isConfirmed = confirm(`Anda akan membeli ${orxAmount} ORX seharga ${totalEthDisplay} ETH Sepolia. Lanjutkan?`);
+            const isConfirmed = confirm(`Anda akan membeli ${orxAmountDisplay} ORX seharga ${totalEthDisplay} ETH Sepolia. Lanjutkan?`);
             if (!isConfirmed) return;
             
-            // 2. 🔥 Panggil fungsi 'buy' pada Smart Contract dan lampirkan nilai ETH (totalWei)
-            console.log(`Memanggil fungsi buy() pada kontrak ${ORX_TOKEN_ADDRESS} dengan nilai: ${totalEthDisplay} ETH (${totalWei} Wei)...`);
+            // 2. Transaksi Smart Contract
+            
+            console.log(`[Blockchain] Memanggil buy() pada kontrak ${ORX_TOKEN_ADDRESS} dengan nilai: ${totalEthDisplay} ETH...`);
 
             const tx = await orxContract.buy({
-                value: totalWei // Mengirim ETH (value) bersamaan dengan panggilan fungsi
+                value: totalWei 
             });
 
-            // 3. Tunggu konfirmasi transaksi
-            alert(`Transaksi dikirim! Hash: ${tx.hash}. Menunggu konfirmasi Blockchain...`);
+            console.log(`[Blockchain] Transaksi dikirim! Hash: ${tx.hash}. Menunggu konfirmasi...`);
+            
             const receipt = await tx.wait(); 
 
-            if (receipt.status === 1) {
-                // Transaksi Blockchain SUKSES. Kontrak telah mencetak token ke msg.sender (currentAccount).
-                alert('✅ Pembelian ORX berhasil di Blockchain! Token telah dicetak ke wallet Anda. Mencatat pembelian di server...');
-                
-                // --- Panggil Backend Laravel (hanya untuk pencatatan) ---
+            if (receipt.status !== 1) {
+                alert('Transaksi Blockchain gagal dikonfirmasi.');
+                return;
+            }
+            
+            console.log(`✅ Transaksi Blockchain sukses! Token dicetak ke wallet. Hash: ${receipt.hash}.`);
+            console.log(`[Server] Mencoba mencatat transaksi ke backend Laravel...`);
+            
+            // 3. Pencatatan Backend Laravel
+            
+            try {
                 const response = await fetch('/buy-ory-token', {
                     method: 'POST',
                     headers: {
@@ -482,46 +569,61 @@ const updateORXBalance = async (address) => {
                     body: JSON.stringify({
                         wallet_address: currentAccount,
                         transaction_hash: tx.hash,
-                        orx_amount: orxAmount.toString(),
-                        eth_paid: totalEthDisplay
+                        orx_amount: orxAmountDisplay,
+                        eth_paid: totalEthDisplay,
+                        id_users: idUsers,
                     })
                 });
 
-                const data = await response.json();
-
-                if (response.ok) {
-                    alert(`Pencatatan Pembelian ORX Berhasil! ${data.message}`);
-                    updateORXBalance(currentAccount); 
-                    // Tutup modal
-                    const modal = bootstrap.Modal.getInstance(document.getElementById('buyOryModal'));
-                    if (modal) modal.hide();
-                } else {
-                    alert(`Pencatatan Pembelian Gagal di Server: ${data.message || 'Server gagal mencatat pembelian.'} Token ORX Anda *seharusnya* sudah masuk, periksa saldo Anda.`);
+                if (!response.ok) {
+                    let serverErrorData;
+                    try {
+                        serverErrorData = await response.json();
+                    } catch (e) {
+                        throw new Error(`Server Error (${response.status}): ${response.statusText}. Cek Koneksi DB & Log Laravel. (Gagal Parse JSON)`);
+                    }
+                    
+                    throw new Error(`Pencatatan Gagal (${response.status}): ${serverErrorData.message || 'Error server tidak terdefinisi.'}`);
                 }
 
-            } else {
-                alert('Transaksi Blockchain gagal dikonfirmasi.');
-            }
+                const data = await response.json();
 
-        } catch (error) {
-            console.error("Kesalahan Pembelian ORX:", error);
-            let message = 'Gagal melakukan transaksi kontrak.';
+                // SCRIPT SUCCESS AKHIR
+                console.log("✅ Pencatatan Server Berhasil:", data.message);
+                alert(`🎉 Pembelian Sukses! ${data.message}`);
+                
+                updateORXBalance(currentAccount); 
+                const modal = bootstrap.Modal.getInstance(document.getElementById('buyOryModal'));
+                if (modal) modal.hide();
+
+            } catch (fetchError) {
+                console.error("❌ Kesalahan Pencatatan Laravel:", fetchError);
+                alert(`⚠️ Gagal Mencatat Transaksi di Server! Pesan: ${fetchError.message}. Token ORX Anda sudah masuk, mohon hubungi admin.`);
+            }
+            
+        } catch (error) { 
+            console.error("❌ Kesalahan Transaksi Blockchain:", error);
+            let message = 'Gagal melakukan transaksi kontrak.'; 
+            
             if (error.message && error.message.includes('user rejected transaction')) {
-                 message = 'Transaksi dibatalkan oleh pengguna Metamask.';
+                message = 'Transaksi dibatalkan oleh pengguna Metamask.';
             } else if (error.message && error.message.includes('insufficient funds')) {
-                 message = 'Saldo Sepolia ETH Anda tidak mencukupi.';
+                message = 'Saldo ETH tidak mencukupi.';
             } else if (error.message && error.message.includes('revert')) {
-                 message = 'Transaksi dibatalkan oleh kontrak (revert). Cek apakah saldo ETH Anda mencukupi untuk token minimum.';
+                message = 'Transaksi dibatalkan oleh kontrak (revert).';
+            } else if (error.code === 'ACTION_REJECTED') {
+                message = 'Transaksi dibatalkan oleh pengguna Metamask (Ethers v6).';
+            } else if (error.code === 'CALL_EXCEPTION') {
+                message = 'Transaksi gagal dieksekusi (revert). Cek saldo ETH dan ORX Anda.';
             }
             alert(`❌ ${message}`);
         }
     }
 
+    // -------------------------------------------------------------------------
+    // --- FUNGSI METAMASK & PEMBELIAN BUKU ---
+    // -------------------------------------------------------------------------
 
-    // =========================================================================
-    // FUNGSI UTAMA (Tidak Berubah)
-    // =========================================================================
-    
     /**
      * FUNGSI KONEKSI METAMASK & VERIFIKASI SIGNATURE
      */
@@ -575,7 +677,7 @@ const updateORXBalance = async (address) => {
                 updateORXBalance(walletAddress);
 
                 if (data.redirect) {
-                     window.location.href = data.redirect;
+                    window.location.href = data.redirect;
                 }
             } else {
                 const errorData = await response.json();
@@ -604,8 +706,9 @@ const updateORXBalance = async (address) => {
             
             const orxContract = new ethers.Contract(ORX_TOKEN_ADDRESS, ORX_TOKEN_ABI, signer);
 
-            // Konversi harga (ORX) ke format BigInt/Wei (asumsi 18 desimal)
-            const amountInWei = ethers.parseUnits(price.toString(), 18);
+            // ✅ PERBAIKAN: Menggunakan konstanta desimal yang benar. 
+            // Jika desimal 0, 5 ORX akan diubah menjadi 5 (unit terkecil).
+            const amountInWei = ethers.parseUnits(price.toString(), ORX_TOKEN_DECIMALS); 
             
             alert(`Meminta transfer ${price} ORX ke Platform...`);
             
@@ -649,18 +752,21 @@ const updateORXBalance = async (address) => {
             console.error("Kesalahan Pembelian ORX:", error);
             let message = 'Gagal melakukan transfer token.';
             if (error.message && error.message.includes('insufficient funds')) {
-                 message = 'Saldo ORX Anda tidak mencukupi untuk membeli buku ini.';
+                message = 'Saldo ORX Anda tidak mencukupi untuk membeli buku ini.';
             } else if (error.message && error.message.includes('user rejected transaction')) {
-                 message = 'Transaksi dibatalkan oleh pengguna Metamask.';
+                message = 'Transaksi dibatalkan oleh pengguna Metamask.';
+            } else if (error.code === 'CALL_EXCEPTION') {
+                 message = 'Transaksi gagal dieksekusi (revert). Pastikan Anda memiliki saldo ORX yang cukup.';
             }
             alert(`❌ ${message}`);
         }
     };
 
 
-    /**
-     * INITIALIZATION & EVENT LISTENERS
-     */
+    // -------------------------------------------------------------------------
+    // --- INITIALIZATION & EVENT LISTENERS ---
+    // -------------------------------------------------------------------------
+
     document.addEventListener('DOMContentLoaded', () => {
         // Cek status tersimpan saat halaman dimuat
         const storedAddress = localStorage.getItem(METAMASK_ADDRESS_KEY);
@@ -681,7 +787,7 @@ const updateORXBalance = async (address) => {
             });
         }
         
-        // 2. Listener untuk tombol Beli di modal (Pemanggilan fungsi ERC-20 Transfer)
+        // 2. Listener untuk tombol Beli Buku
         document.querySelectorAll('.buy-book-btn').forEach(button => {
             button.addEventListener('click', (e) => {
                 const bookId = e.target.getAttribute('data-book-id');
@@ -693,7 +799,7 @@ const updateORXBalance = async (address) => {
         // 3. Listener untuk tombol Konfirmasi Pembelian ORX (Modal)
         const submitBuyOryButton = document.getElementById('submitBuyOry');
         if (submitBuyOryButton) {
-             submitBuyOryButton.addEventListener('click', buyOry);
+            submitBuyOryButton.addEventListener('click', buyOry);
         }
 
         // --- Event Listeners untuk Modal Pembelian ORX ---
@@ -718,19 +824,10 @@ const updateORXBalance = async (address) => {
                 }
                 window.location.reload(); 
             });
-            
-            window.ethereum.on('chainChanged', (chainId) => {
-                window.location.reload(); 
-            });
         }
     });
-
-    // Panggil fungsi ini agar tersedia di scope global (untuk button onclick di HTML)
-    window.updateOryAmount = updateOryAmount;
-    window.buyOry = buyOry; 
-    window.connectMetamask = connectMetamask; 
-    window.buyBookWithORX = buyBookWithORX;
-    
 </script>
+
+
 </body>
 </html>
